@@ -76,7 +76,7 @@ async function printTable(enemies, algos){
                 for (match of enemy.matches){
                     if ( match.my_algo == algo.id){
 //                        cell.innerHTML = match.result;
-                        cell.innerHTML = "<a href=https://felixrichter2000.github.io/watch?id="+ match.match_id +" >"+ match.result +"</a>";
+                        cell.innerHTML = "<a href=https://felixrichter2000.github.io/watch?id="+ match.match_id +" target='_blank'>"+ match.result +"</a>";
                     }
                 }
             }
