@@ -1,5 +1,4 @@
-
-
+filter = 'critical'
 
 async function loadPlayerAlgos(playerId){
   const fetched = await fetch(`https://terminal.c1games.com/api/game/user/${playerId}/algos?team=false`)
@@ -7,30 +6,38 @@ async function loadPlayerAlgos(playerId){
   const response = await fetched.json()
 //  console.log(response)
   const algos = response.data.algos
-  if (algos.length < 1) return alert('no matches found')
+  if (algos.length < 1) return alert('no algos found')
 
   enemies = {}
   for (const algo of algos) {
-//  algos.forEach((algo, index) => {
     algoId = algo.id
     const fetched = await fetch(`https://terminal.c1games.com/api/game/algo/${algoId}/matches`)
     if (fetched.status != 200)
         return alert('failed to retrieve algo data')
     const response = await fetched.json()
     const matches = response.data.matches.reverse()
-    if (matches.length < 1)
-        return alert('no matches found')
 
-    matches.forEach((match, index) => {
-        match.result = match.winning_algo.id == algoId ? "W" : "L";
-        match.enemy_algo = match.winning_algo.id == algoId ? match.losing_algo : match.winning_algo;
-        match.my_algo = match.winning_algo.id == algoId ? match.winning_algo : match.losing_algo;
+    algo.num_matches = matches.length
+    algo.num_wins = 0
+    algo.num_lost = 0
+    for (match of matches){
+        if(match.winning_algo.id == algoId){
+            match.result = "W";
+            match.enemy_algo = match.losing_algo;
+            match.my_algo = match.winning_algo;
+            algo.num_wins += 1
+        }else{
+            match.result = "L";
+            match.enemy_algo = match.winning_algo;
+            match.my_algo = match.losing_algo;
+            algo.num_lost += 1
+        }
 
         if (!(match.enemy_algo.id in enemies)){
             enemies[match.enemy_algo.id] = {'player':{}, 'algo':match.enemy_algo, 'matches':[]}
         }
         enemies[match.enemy_algo.id]['matches'].push({'match_id': match.id, 'my_algo':match.my_algo.id,  'enemy_algo_id': match.enemy_algo.id, 'result': match.result} )
-    })
+    }
   }
   printTable(enemies, algos);
 }
@@ -47,7 +54,7 @@ async function printTable(enemies, algos){
     hcell3 =row.insertCell();
     hcell3.innerHTML = 'Rating';
     for(algo of algos){
-        var cell = row.insertCell().innerHTML = algo.name
+        var cell = row.insertCell().innerHTML = algo.name + '</br><small>R:' + algo.rating + ' W/L:' + algo.num_wins +'/'+ algo.num_lost + '</small>'
     }
 
     enemies_arr = Object.values(enemies)
@@ -56,14 +63,14 @@ async function printTable(enemies, algos){
     });
 
     for (enemy of enemies_arr) {
-        interesting_row = false
+        critical_row = false
         for(match of enemy.matches){
             if(match.result == "L"){
-                interesting_row = true
+                critical_row = true
             }
         }
 
-        if (interesting_row){
+        if (critical_row || filter == 'all'){
             var row = table.insertRow();
             cell1 = row.insertCell()
             cell1.innerHTML = enemy.algo.id;
@@ -88,12 +95,24 @@ async function printTable(enemies, algos){
 window.onload = () => {
 //  document.getElementById('find').onclick = () => window.location.search = `?id=${document.getElementById('algo-id').value}`
 //  document.getElementById('update').onclick = () => plot()
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
 
-    const algoId = window.location.search.split('?id=')[1];
-    if (typeof(algoId) == "undefined"){
-        document.getElementById('player_form').style.display = "";
+    filter = 'critical';
+    if (urlParams.get('filter')) {
+         filter = urlParams.get('filter').toLowerCase();
+    }
+
+    if (urlParams.get('id')) {
+        loadPlayerAlgos(urlParams.get('id'));
     }else{
-        loadPlayerAlgos(algoId);
+        document.getElementById('player_form').style.display = "";
+    }
+
+    if (typeof(algoId) == "undefined"){
+
+    }else{
+
     }
 
 }
