@@ -132,7 +132,7 @@ async function load_player_info(){
             cell1.innerHTML = "<img style='height:22px; width:22px; margin: -6px -5px;' src='"+avatarUrl+"' >"
         }
         if(player_name){
-            cell2.innerHTML = "<a href='file:///D:/terminal/Season5/stats/index.html?id="+user_id+"&filter=critical&info=1' target='_blank'>"+player_name+"</a>"
+            cell2.innerHTML = "<a href='index.html?id="+user_id+"&filter=critical&info=1' target='_blank'>"+player_name+"</a>"
         }
         if(ranking){
             cell3.innerHTML = ranking
