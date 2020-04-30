@@ -35,7 +35,7 @@ async function loadPlayerAlgos(playerId, info){
         if (!(match.enemy_algo.id in enemies)){
             enemies[match.enemy_algo.id] = {'player':{}, 'algo':match.enemy_algo, 'matches':[]}
         }
-        enemies[match.enemy_algo.id]['matches'].push({'match_id': match.id, 'my_algo':match.my_algo.id,  'enemy_algo_id': match.enemy_algo.id, 'result': match.result} )
+        enemies[match.enemy_algo.id]['matches'].push({'match_id': match.id, 'my_algo':match.my_algo.id,  'enemy_algo_id': match.enemy_algo.id, 'result': match.result, 'crashed': match.crashed} )
     }
   }
   printTable(enemies, algos);
@@ -44,7 +44,7 @@ async function loadPlayerAlgos(playerId, info){
   }
 }
 
-async function printTable(enemies, algos){
+async function printTable(enemies, algos, ){
     // Find a <table> element with id="myTable":
     var table = document.getElementById("table");
     var header = table.createTHead();
@@ -84,7 +84,12 @@ async function printTable(enemies, algos){
                 for (match of enemy.matches){
                     if ( match.my_algo == algo.id){
 //                        cell.innerHTML = match.result;
-                        cell.innerHTML = "<a href=https://felixrichter2000.github.io/watch?id="+ match.match_id +" target='_blank'>"+ match.result +"</a>";
+                        if (match.crashed){
+                            cell.innerHTML = "<a title='crashed' href=https://felixrichter2000.github.io/watch?id="+ match.match_id +" target='_blank'>!"+ match.result +"</a>" ;
+                        }else{
+                            cell.innerHTML = "<a href=https://felixrichter2000.github.io/watch?id="+ match.match_id +" target='_blank'>"+ match.result +"</a>";
+                        }
+                        cell.className = 'result-'+match.result.toLowerCase()
                     }
                 }
             }
@@ -108,18 +113,20 @@ async function load_player_info(){
 
         enemy_algo_id = row.getAttribute('data-enemy-algo-id');
         const fetched = await fetch(`https://terminal.c1games.com/api/game/algo/${enemy_algo_id}/matches?user_info=true&limit=1`)
+//        const fetched = await fetch(`https://terminal.c1games.com/api/game/algo/${enemy_algo_id}/matches?user_info=true`)
         if (fetched.status != 200)
             return alert('failed to retrieve algo data')
         const response = await fetched.json()
-        const match_with_info = response.data.matches.reverse()[0]
+        const matches = response.data.matches.reverse()
+        const match_with_info = matches[0]
 
         if (match_with_info.losing_algo['id'] == enemy_algo_id){
-            user_id = match_with_info.losing_user['userID']
+            user_id = match_with_info.losing_user['id']
             avatarUrl = match_with_info.losing_user['avatarUrl']
             player_name = match_with_info.losing_user['displayName']  // match_with_info.losing_user['name']
             ranking = match_with_info.losing_user['rankedTier']
         }else{
-            user_id = match_with_info.winning_user['userID']
+            user_id = match_with_info.winning_user['id']
             avatarUrl = match_with_info.winning_user['avatarUrl']
             player_name = match_with_info.winning_user['displayName'] // match_with_info.losing_user['name']
             ranking = match_with_info.winning_user['rankedTier']
@@ -137,6 +144,16 @@ async function load_player_info(){
         if(ranking){
             cell3.innerHTML = ranking
         }
+
+//        old_matches = []
+//        for(match in matches){
+//            if (match.winning_user.userID = user_id){
+//                console.log('W '+ match.winning_algo.name)
+//            }
+//            if (match.losing_user.userID = user_id){
+//                console.log('L '+ match.losing_algo.name)
+//            }
+//        }
     }
 }
 
