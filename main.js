@@ -1,16 +1,38 @@
 filter = 'critical'
+prefix = 'Demorf_v|demorf_v'
+algos = []
+algo_ids = '120174|120175'
 
 async function loadPlayerAlgos(playerId, info){
+  if (algo_ids){
+      for(id of algo_ids.split("|")){
+        algos.push({id:id})
+      }
+  }
   const fetched = await fetch(`https://terminal.c1games.com/api/game/user/${playerId}/algos?team=false`)
   if (fetched.status != 200) return alert('failed to retrieve user data')
   const response = await fetched.json()
-  const algos = response.data.algos
+  const player_algos = response.data.algos
+
+  player_algo_loop: for (algo of player_algos){
+    for (_algo of algos){
+      if (algo.id == _algo.id){
+        continue player_algo_loop
+      }
+    }
+    algos.push({id:algo.id})
+  }
+
   if (algos.length < 1) return alert('no algos found')
 
   enemies = {}
+  count = 0;
   for (const algo of algos) {
+    count +=1
     algoId = algo.id
+//    console.log(algo.id)
     const fetched = await fetch(`https://terminal.c1games.com/api/game/algo/${algoId}/matches`)
+    message('Fetching algos: #' + algo.id + '  ('+count +":"+algos.length +') ')
     if (fetched.status != 200)
         return alert('failed to retrieve algo data')
     const response = await fetched.json()
@@ -32,19 +54,25 @@ async function loadPlayerAlgos(playerId, info){
             algo.num_lost += 1
         }
 
+        if(!algo.name){
+            algo.name = match.my_algo.name
+            algo.rating = match.my_algo.rating
+        }
+
         if (!(match.enemy_algo.id in enemies)){
             enemies[match.enemy_algo.id] = {'player':{}, 'algo':match.enemy_algo, 'matches':[]}
         }
         enemies[match.enemy_algo.id]['matches'].push({'match_id': match.id, 'my_algo':match.my_algo.id,  'enemy_algo_id': match.enemy_algo.id, 'result': match.result, 'crashed': match.crashed} )
     }
   }
+  message('')
   printTable(enemies, algos);
   if (info & info == 1){
     load_player_info();
   }
 }
 
-async function printTable(enemies, algos, ){
+async function printTable(enemies, algos){
     // Find a <table> element with id="myTable":
     var table = document.getElementById("table");
     var header = table.createTHead();
@@ -54,7 +82,10 @@ async function printTable(enemies, algos, ){
     hcell2 =row.insertCell();
     hcell2.innerHTML = 'Rating';
     for(algo of algos){
-        var cell = row.insertCell().innerHTML = algo.name + '</br><small>R:' + algo.rating + ' W/L:' + algo.num_wins +'/'+ algo.num_lost + '</small>'
+//        console.log(algo)
+        name = algo.name.replace(new RegExp(prefix), '')
+        var cell = row.insertCell().innerHTML = '<a href=https://bcverdict.github.io/?id='+ algo.id +' target="_blank" class="my_algos_name">'
+        +name + '</a></br><small>R ' + algo.rating + ' W/L ' + algo.num_wins +'/'+ algo.num_lost + '</small>'
     }
 
     enemies_arr = Object.values(enemies)
@@ -157,6 +188,9 @@ async function load_player_info(){
     }
 }
 
+function message(msg){
+    document.getElementById('message').innerHTML = msg
+}
 
 window.onload = () => {
 //  document.getElementById('find').onclick = () => window.location.search = `?id=${document.getElementById('algo-id').value}`
@@ -167,6 +201,13 @@ window.onload = () => {
     filter = 'critical';
     if (urlParams.get('filter')) {
          filter = urlParams.get('filter').toLowerCase();
+    }
+
+    if (urlParams.get('prefix')) prefix = urlParams.get('prefix')
+
+    algo_ids = ""
+    if (urlParams.get('algo_ids')){
+        algo_ids = urlParams.get('algo_ids')
     }
 
     if (urlParams.get('id')) {

@@ -7,6 +7,7 @@
   </head>
   <body>
       <div style='text-align:center'>
+          <div id="message"></div>
           <table id="table">
           </table>
       </div>
@@ -18,6 +19,9 @@
                   <input type="radio" id="filter_critical" name="filter" value="critical" checked="checked"><label for="filter_critical">Critical</label></br>
                   </br>
                   <input type="checkbox" id="player_info" name="info" value="1"><label for="player_info">Load Player Info</label></br>
+                  </br>
+                  <input type="text" id="prefix" name="prefix" placeholder="Hero_v|hero-"><label for="prefix">Name Prefix</label></br>
+                  <input type="text" id="algo_ids" name="algo_ids" placeholder="120174|120175"><label for="prefix">Algo List</label></br>
               </div>
           </form>
       </div>
@@ -46,7 +50,6 @@
       a{
         color: #ddd;
         text-decoration:none;
-        border-bottom: 1px solid #1a181e;
       }
 
       a:visited{
@@ -61,7 +64,7 @@
         color: #83888a;
       }
 
-      td.result-w a:visited{    
+      td.result-w a:visited{
         color: #2a574e;
       }
 
@@ -74,5 +77,17 @@
          margin: 0 auto;
          text-align:left;
       }
+
+      tr:nth-child(even) {
+      }
+
+      table tr:hover{
+        background: #2D2934
+      }
+      a.my_algos_name{
+        white-space:nowrap;
+      }
+
+
   </style>
 </html>
