@@ -41,7 +41,7 @@ async function loadPlayerAlgos(playerId, info){
     algo.num_matches = matches.length
     algo.num_wins = 0
     algo.num_lost = 0
-    algo.name = algo.id.toString()
+//    algo.name = algo.id.toString()
     for (match of matches){
         if(match.winning_algo.id == algoId){
             match.result = "W";
