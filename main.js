@@ -41,6 +41,7 @@ async function loadPlayerAlgos(playerId, info){
     algo.num_matches = matches.length
     algo.num_wins = 0
     algo.num_lost = 0
+    algo.name = algo.id.toString()
     for (match of matches){
         if(match.winning_algo.id == algoId){
             match.result = "W";
@@ -82,7 +83,6 @@ async function printTable(enemies, algos){
     hcell2 =row.insertCell();
     hcell2.innerHTML = 'Rating';
     for(algo of algos){
-//        console.log(algo)
         name = algo.name.replace(new RegExp(prefix), '')
         var cell = row.insertCell().innerHTML = '<a href=https://bcverdict.github.io/?id='+ algo.id +' target="_blank" class="my_algos_name">'
         +name + '</a></br><small>R ' + algo.rating + ' W/L ' + algo.num_wins +'/'+ algo.num_lost + '</small>'
