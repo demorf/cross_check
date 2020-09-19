@@ -32,19 +32,29 @@
         background: black;
         color: #ddd;
         font-family: Tahoma, Geneva, sans-serif;
+        margin:0;
+        padding: 0
       }
       table {
         border: 1px solid #222;
         border-collapse: collapse;
         background: #1a181e;
+        position:relative
       }
       table tr{
       }
-      table th td{
+
+      #table_header td,
+      table th{
+        position: sticky;
+        top: 0;
+        /* background: #1a181e; */
+        background: #333;
       }
       table tr td{
         border: 1px solid #222;
-        padding : 2px 5px;
+        /* padding : 2px 5px;*/
+        padding: 0 5px;
       }
 
       a{

@@ -77,6 +77,7 @@ async function printTable(enemies, algos){
     // Find a <table> element with id="myTable":
     var table = document.getElementById("table");
     var header = table.createTHead();
+    header.id = 'table_header'
     var row = header.insertRow(-1);
     hcell1 =row.insertCell();
     hcell1.innerHTML = 'Algo';
@@ -87,6 +88,7 @@ async function printTable(enemies, algos){
         var cell = row.insertCell().innerHTML = '<a href=https://bcverdict.github.io/?id='+ algo.id +' target="_blank" class="my_algos_name">'
         +name + '</a></br><small>R ' + algo.rating + ' W/L ' + algo.num_wins +'/'+ algo.num_lost + '</small>'
     }
+    var tbody = table.createTBody();
 
     enemies_arr = Object.values(enemies)
     enemies_arr.sort(function(a, b){
@@ -102,7 +104,7 @@ async function printTable(enemies, algos){
         }
 
         if (critical_row || filter == 'all'){
-            var row = table.insertRow(-1);
+            var row = tbody.insertRow(-1);
             row.setAttribute('data-match-id', match.match_id)
             row.setAttribute('data-enemy-algo-id', enemy.algo.id)
             cell1 = row.insertCell()
