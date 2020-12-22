@@ -9,7 +9,8 @@ async function loadPlayerAlgos(playerId, info){
         algos.push({id:id})
       }
   }
-  const fetched = await fetch(`https://terminal.c1games.com/api/game/user/${playerId}/algos?team=false`)
+//  const fetched = await fetch(`https://terminal.c1games.com/api/game/user/${playerId}/algos?team=false`)
+  const fetched = await fetch(`https://terminal.c1games.com/api/game/user/${playerId}/algos`)
   if (fetched.status != 200) return alert('failed to retrieve user data')
   const response = await fetched.json()
   const player_algos = response.data.algos
@@ -64,6 +65,11 @@ async function loadPlayerAlgos(playerId, info){
             enemies[match.enemy_algo.id] = {'player':{}, 'algo':match.enemy_algo, 'matches':[]}
         }
         enemies[match.enemy_algo.id]['matches'].push({'match_id': match.id, 'my_algo':match.my_algo.id,  'enemy_algo_id': match.enemy_algo.id, 'result': match.result, 'crashed': match.crashed} )
+    }
+
+    if(!algo.name){
+        algo.name = 'NotThereYet'
+        algo.rating = 1500
     }
   }
   message('')
